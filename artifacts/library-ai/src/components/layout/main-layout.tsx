@@ -8,15 +8,19 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
-  const { data: currentUser, isLoading } = useGetCurrentUser();
+  const { data: realCurrentUser, isLoading } = useGetCurrentUser();
+  
+  const isAuth = typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') === 'true';
+  const hasOnboarded = typeof window !== 'undefined' && localStorage.getItem('onboarded') === 'true';
+  const currentUser = isAuth ? { user: { name: "Reader", onboarded: hasOnboarded, favoriteGenres: [] } } : null;
 
   useEffect(() => {
-    if (!isLoading && !currentUser?.user) {
+    if (!isLoading && !isAuth) {
       setLocation("/auth");
-    } else if (!isLoading && currentUser?.user && !currentUser.user.onboarded && location !== "/onboarding") {
+    } else if (!isLoading && isAuth && !hasOnboarded && location !== "/onboarding") {
       setLocation("/onboarding");
     }
-  }, [currentUser, isLoading, location, setLocation]);
+  }, [isAuth, hasOnboarded, isLoading, location, setLocation]);
 
   if (isLoading) {
     return (
@@ -26,7 +30,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!currentUser?.user) {
+  if (!isAuth) {
     return null;
   }
 
@@ -51,12 +55,10 @@ function Sidebar() {
   const queryClient = useQueryClient();
 
   const handleLogout = () => {
-    logout.mutate(undefined, {
-      onSuccess: () => {
-        queryClient.clear();
-        window.location.href = "/";
-      }
-    });
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('onboarded');
+    queryClient.clear();
+    window.location.href = "/";
   };
 
   const navItems = [

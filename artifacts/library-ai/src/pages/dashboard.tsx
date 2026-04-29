@@ -39,15 +39,38 @@ function StatsCard({ label, value, icon, accent, dot, isLoading }: StatsCardProp
   );
 }
 
+const MOCK_BOOKS = [
+  { id: 1, title: "The Midnight Library", author: "Matt Haig", coverUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop", rating: 4.5, genre: "Fiction" },
+  { id: 2, title: "Dune", author: "Frank Herbert", coverUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=800&auto=format&fit=crop", rating: 4.8, genre: "Science Fiction" },
+  { id: 3, title: "Project Hail Mary", author: "Andy Weir", coverUrl: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=800&auto=format&fit=crop", rating: 4.9, genre: "Science Fiction" },
+  { id: 4, title: "Atomic Habits", author: "James Clear", coverUrl: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800&auto=format&fit=crop", rating: 4.7, genre: "Non-Fiction" },
+  { id: 5, title: "Dark Matter", author: "Blake Crouch", coverUrl: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=800&auto=format&fit=crop", rating: 4.6, genre: "Sci-Fi Thriller" },
+];
+
+const MOCK_RECS = MOCK_BOOKS.map(b => ({ book: b, matchPercent: 90 + Math.floor(Math.random() * 9), reason: "Based on your reading history" }));
+const MOCK_CONTINUE = [ { id: 101, book: MOCK_BOOKS[0], progress: 45 }, { id: 102, book: MOCK_BOOKS[1], progress: 12 } ];
+const MOCK_STATS = { totalBooks: 4520, available: 3200, prebooked: 150, issued: 1170, recentlyPrebooked: [MOCK_BOOKS[0], MOCK_BOOKS[2]] };
+
 export default function DashboardPage() {
   const { data: currentUser } = useGetCurrentUser();
   const userName = currentUser?.user?.name?.split(" ")[0] || "Reader";
 
-  const { data: recommendations, isLoading: loadingRecs } = useGetRecommendations({ limit: 10 });
-  const { data: continueReading, isLoading: loadingContinue } = useListContinueReading();
-  const { data: trendingBooks, isLoading: loadingTrending } = useListTrendingBooks();
-  const { data: basedOnInterests, isLoading: loadingInterests } = useGetBasedOnInterests();
-  const { data: stats, isLoading: loadingStats } = useGetLibraryStats();
+  const { data: recommendationsRaw } = useGetRecommendations({ limit: 10 });
+  const { data: continueReadingRaw } = useListContinueReading();
+  const { data: trendingBooksRaw } = useListTrendingBooks();
+  const { data: basedOnInterestsRaw } = useGetBasedOnInterests();
+  const { data: statsRaw } = useGetLibraryStats();
+
+  const recommendations = Array.isArray(recommendationsRaw) && recommendationsRaw.length > 0 ? recommendationsRaw : MOCK_RECS;
+  const continueReading = Array.isArray(continueReadingRaw) && continueReadingRaw.length > 0 ? continueReadingRaw : MOCK_CONTINUE;
+  const trendingBooks = Array.isArray(trendingBooksRaw) && trendingBooksRaw.length > 0 ? trendingBooksRaw : MOCK_BOOKS;
+  const basedOnInterests = Array.isArray(basedOnInterestsRaw) && basedOnInterestsRaw.length > 0 ? basedOnInterestsRaw : MOCK_RECS;
+  const stats = statsRaw?.totalBooks ? statsRaw : MOCK_STATS;
+  const loadingRecs = false;
+  const loadingContinue = false;
+  const loadingTrending = false;
+  const loadingInterests = false;
+  const loadingStats = false;
 
   return (
     <div className="space-y-12 animate-in fade-in duration-500 pb-12">
