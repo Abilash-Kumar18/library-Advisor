@@ -52,10 +52,12 @@ export function BookCard({ book, matchPercent, reason, showMatch }: BookCardProp
             <Badge variant="secondary" className="bg-secondary/10 text-secondary hover:bg-secondary/20 transition-colors border-transparent text-xs font-normal px-2 py-0.5">
               {book.genre}
             </Badge>
-            <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
-              <Star className="h-3.5 w-3.5 fill-accent text-accent" />
-              {book.rating.toFixed(1)}
-            </div>
+            {typeof book.rating === "number" && (
+              <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+                {book.rating.toFixed(1)}
+              </div>
+            )}
           </div>
           
           {reason && (
