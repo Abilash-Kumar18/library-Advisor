@@ -15,7 +15,9 @@ import {
   getGetLibraryStatsQueryKey,
   BookDetailLibraryStatus,
   AddLibraryEntryRequestStatus,
-  UpdateBookStatusRequestStatus
+  UpdateBookStatusRequestStatus,
+  Book,
+  BookDetail
 } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,10 +38,11 @@ export default function BookDetailPage() {
   
   const { data: bookRaw } = useGetBook(id!, { query: { enabled: !!id, queryKey: getGetBookQueryKey(id!) } });
   
-  const MOCK_BOOK = {
-    id: Number(id),
+  const MOCK_BOOK: BookDetail = {
+    id: id || "1",
     title: "The Midnight Library",
     author: "Matt Haig",
+    authorBio: "Matt Haig is the number one bestselling author of Reasons to Stay Alive, Notes on a Nervous Planet and six highly acclaimed novels for adults, including How to Stop Time.",
     coverUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop",
     rating: 4.5,
     ratingsCount: 12500,
@@ -47,14 +50,15 @@ export default function BookDetailPage() {
     genre: "Fiction",
     year: 2020,
     description: "Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived. To see how things would be if you had made other choices... Would you have done anything different, if you had the chance to undo your regrets?",
+    shortDescription: "Between life and death there is a library...",
     tags: ["Time Travel", "Philosophy", "Contemporary Fiction"],
     status: "available",
     inLibrary: false,
-    libraryStatus: undefined,
+    libraryStatus: null,
     similarBooks: []
   };
 
-  const book = bookRaw?.rating ? bookRaw : MOCK_BOOK;
+  const book = bookRaw?.rating ? (bookRaw as BookDetail) : MOCK_BOOK;
   
   // Dummy mutations for UI state
   const addMutation = { isPending: false };

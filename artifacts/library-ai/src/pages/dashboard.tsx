@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { Loader2, ArrowRight, Flame, Clock, BookMarked, BookCheck, Bookmark, BookOpen } from "lucide-react";
 
-import { useGetCurrentUser, useListTrendingBooks, useListContinueReading, useGetRecommendations, useGetBasedOnInterests, useGetLibraryStats } from "@workspace/api-client-react";
+import { useGetCurrentUser, useListTrendingBooks, useListContinueReading, useGetRecommendations, useGetBasedOnInterests, useGetLibraryStats, Book, Recommendation, LibraryEntry, LibraryStats } from "@workspace/api-client-react";
 import { BookCard } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,17 +39,98 @@ function StatsCard({ label, value, icon, accent, dot, isLoading }: StatsCardProp
   );
 }
 
-const MOCK_BOOKS = [
-  { id: 1, title: "The Midnight Library", author: "Matt Haig", coverUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop", rating: 4.5, genre: "Fiction" },
-  { id: 2, title: "Dune", author: "Frank Herbert", coverUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=800&auto=format&fit=crop", rating: 4.8, genre: "Science Fiction" },
-  { id: 3, title: "Project Hail Mary", author: "Andy Weir", coverUrl: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=800&auto=format&fit=crop", rating: 4.9, genre: "Science Fiction" },
-  { id: 4, title: "Atomic Habits", author: "James Clear", coverUrl: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800&auto=format&fit=crop", rating: 4.7, genre: "Non-Fiction" },
-  { id: 5, title: "Dark Matter", author: "Blake Crouch", coverUrl: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=800&auto=format&fit=crop", rating: 4.6, genre: "Sci-Fi Thriller" },
+const MOCK_BOOKS: Book[] = [
+  { 
+    id: "1", 
+    title: "The Midnight Library", 
+    author: "Matt Haig", 
+    coverUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop", 
+    rating: 4.5, 
+    genre: "Fiction",
+    tags: ["Contemporary", "Fantasy"],
+    ratingsCount: 12500,
+    pages: 304,
+    year: 2020,
+    shortDescription: "Between life and death there is a library...",
+    status: "available"
+  },
+  { 
+    id: "2", 
+    title: "Dune", 
+    author: "Frank Herbert", 
+    coverUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=800&auto=format&fit=crop", 
+    rating: 4.8, 
+    genre: "Science Fiction",
+    tags: ["Sci-Fi", "Classic"],
+    ratingsCount: 25000,
+    pages: 412,
+    year: 1965,
+    shortDescription: "Set on the desert planet Arrakis...",
+    status: "available"
+  },
+  { 
+    id: "3", 
+    title: "Project Hail Mary", 
+    author: "Andy Weir", 
+    coverUrl: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=800&auto=format&fit=crop", 
+    rating: 4.9, 
+    genre: "Science Fiction",
+    tags: ["Sci-Fi", "Space"],
+    ratingsCount: 18000,
+    pages: 476,
+    year: 2021,
+    shortDescription: "Ryland Grace is the sole survivor...",
+    status: "available"
+  },
+  { 
+    id: "4", 
+    title: "Atomic Habits", 
+    author: "James Clear", 
+    coverUrl: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800&auto=format&fit=crop", 
+    rating: 4.7, 
+    genre: "Non-Fiction",
+    tags: ["Self-Help", "Productivity"],
+    ratingsCount: 35000,
+    pages: 320,
+    year: 2018,
+    shortDescription: "No matter your goals, Atomic Habits offers...",
+    status: "available"
+  },
+  { 
+    id: "5", 
+    title: "Dark Matter", 
+    author: "Blake Crouch", 
+    coverUrl: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=800&auto=format&fit=crop", 
+    rating: 4.6, 
+    genre: "Sci-Fi Thriller",
+    tags: ["Sci-Fi", "Thriller"],
+    ratingsCount: 15000,
+    pages: 342,
+    year: 2016,
+    shortDescription: "Jason Dessen is walking home...",
+    status: "available"
+  },
 ];
 
-const MOCK_RECS = MOCK_BOOKS.map(b => ({ book: b, matchPercent: 90 + Math.floor(Math.random() * 9), reason: "Based on your reading history" }));
-const MOCK_CONTINUE = [ { id: 101, book: MOCK_BOOKS[0], progress: 45 }, { id: 102, book: MOCK_BOOKS[1], progress: 12 } ];
-const MOCK_STATS = { totalBooks: 4520, available: 3200, prebooked: 150, issued: 1170, recentlyPrebooked: [MOCK_BOOKS[0], MOCK_BOOKS[2]] };
+const MOCK_RECS: Recommendation[] = MOCK_BOOKS.map(b => ({ 
+  book: b, 
+  matchPercent: 90 + Math.floor(Math.random() * 9), 
+  reason: "Based on your reading history",
+  model: "hybrid" as const
+}));
+
+const MOCK_CONTINUE: Partial<LibraryEntry>[] = [ 
+  { id: "101", book: MOCK_BOOKS[0], progress: 45 }, 
+  { id: "102", book: MOCK_BOOKS[1], progress: 12 } 
+];
+
+const MOCK_STATS: LibraryStats = { 
+  totalBooks: 4520, 
+  available: 3200, 
+  prebooked: 150, 
+  issued: 1170, 
+  recentlyPrebooked: [MOCK_BOOKS[0], MOCK_BOOKS[2]] 
+};
 
 export default function DashboardPage() {
   const { data: currentUser } = useGetCurrentUser();
@@ -62,7 +143,7 @@ export default function DashboardPage() {
   const { data: statsRaw } = useGetLibraryStats();
 
   const recommendations = Array.isArray(recommendationsRaw) && recommendationsRaw.length > 0 ? recommendationsRaw : MOCK_RECS;
-  const continueReading = Array.isArray(continueReadingRaw) && continueReadingRaw.length > 0 ? continueReadingRaw : MOCK_CONTINUE;
+  const continueReading = Array.isArray(continueReadingRaw) && continueReadingRaw.length > 0 ? continueReadingRaw : MOCK_CONTINUE as LibraryEntry[];
   const trendingBooks = Array.isArray(trendingBooksRaw) && trendingBooksRaw.length > 0 ? trendingBooksRaw : MOCK_BOOKS;
   const basedOnInterests = Array.isArray(basedOnInterestsRaw) && basedOnInterestsRaw.length > 0 ? basedOnInterestsRaw : MOCK_RECS;
   const stats = statsRaw?.totalBooks ? statsRaw : MOCK_STATS;

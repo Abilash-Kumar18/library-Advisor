@@ -2,31 +2,75 @@ import React, { useState } from "react";
 import { Loader2, Library as LibraryIcon, BookOpen, Clock, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 
-import { useListLibrary, ListLibraryStatus } from "@workspace/api-client-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
+import { useListLibrary, getListLibraryQueryKey, Book, LibraryEntry } from "@workspace/api-client-react";
+import { BookCard } from "@/components/book-card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
-const MOCK_BOOKS = [
-  { id: 1, title: "The Midnight Library", author: "Matt Haig", coverUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop" },
-  { id: 2, title: "Dune", author: "Frank Herbert", coverUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=800&auto=format&fit=crop" },
-  { id: 3, title: "Project Hail Mary", author: "Andy Weir", coverUrl: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=800&auto=format&fit=crop" },
+const MOCK_BOOKS: Book[] = [
+  { 
+    id: "1", 
+    title: "The Midnight Library", 
+    author: "Matt Haig", 
+    coverUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop",
+    rating: 4.5,
+    genre: "Fiction",
+    tags: ["Contemporary", "Fantasy"],
+    ratingsCount: 12500,
+    pages: 304,
+    year: 2020,
+    shortDescription: "Between life and death there is a library...",
+    status: "available"
+  },
+  { 
+    id: "2", 
+    title: "Dune", 
+    author: "Frank Herbert", 
+    coverUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=800&auto=format&fit=crop",
+    rating: 4.8,
+    genre: "Science Fiction",
+    tags: ["Sci-Fi", "Classic"],
+    ratingsCount: 25000,
+    pages: 412,
+    year: 1965,
+    shortDescription: "Set on the desert planet Arrakis...",
+    status: "available"
+  },
+  { 
+    id: "3", 
+    title: "Project Hail Mary", 
+    author: "Andy Weir", 
+    coverUrl: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=800&auto=format&fit=crop",
+    rating: 4.9,
+    genre: "Science Fiction",
+    tags: ["Sci-Fi", "Space"],
+    ratingsCount: 18000,
+    pages: 476,
+    year: 2021,
+    shortDescription: "Ryland Grace is the sole survivor...",
+    status: "available"
+  },
 ];
 
-const MOCK_LIBRARY = [
-  { id: 101, book: MOCK_BOOKS[0], status: "reading", progress: 45, rating: null },
-  { id: 102, book: MOCK_BOOKS[1], status: "read", progress: 100, rating: 5 },
-  { id: 103, book: MOCK_BOOKS[2], status: "want_to_read", progress: 0, rating: null }
+const MOCK_LIBRARY: LibraryEntry[] = [
+  { id: "1", bookId: "1", book: MOCK_BOOKS[0], status: "reading", progress: 45, addedAt: new Date().toISOString() },
+  { id: "2", bookId: "2", book: MOCK_BOOKS[1], status: "want_to_read", progress: 0, addedAt: new Date().toISOString() },
+  { id: "3", bookId: "3", book: MOCK_BOOKS[2], status: "read", progress: 100, rating: 5, addedAt: new Date().toISOString() },
 ];
 
 export default function LibraryPage() {
-  const [status, setStatus] = useState<ListLibraryStatus | "all">("reading");
+  const [status, setStatus] = useState<"reading" | "read" | "want_to_read" | "all">("all");
+  const [search, setSearch] = useState("");
   
-  const { data: libraryEntriesRaw } = useListLibrary(
-    status !== "all" ? { status } : {}
-  );
-  
-  const libraryEntries = Array.isArray(libraryEntriesRaw) ? libraryEntriesRaw : (status === "all" ? MOCK_LIBRARY : MOCK_LIBRARY.filter(e => e.status === status));
+  const { data: libraryEntriesRaw } = useListLibrary({ status: status === "all" ? undefined : status });
+  const libraryEntries = Array.isArray(libraryEntriesRaw) && libraryEntriesRaw.length > 0 ? libraryEntriesRaw : MOCK_LIBRARY.filter(e => {
+    if (status !== "all" && e.status !== status) return false;
+    if (search && !e.book.title.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
   const isLoading = false;
 
   return (
