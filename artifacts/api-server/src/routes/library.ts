@@ -9,7 +9,7 @@ import {
   RemoveFromLibraryParams,
 } from "@workspace/api-zod";
 import { requireUser } from "../lib/auth";
-import { libraryEntryToPublic } from "../lib/serialize";
+import { libraryEntryToPublic, bookToPublic } from "../lib/serialize";
 import type { User } from "@workspace/db";
 
 const router: IRouter = Router();
@@ -35,6 +35,24 @@ router.get("/library", requireUser, async (req, res): Promise<void> => {
     .where(and(...filters))
     .orderBy(desc(libraryEntriesTable.addedAt));
   res.json(rows.map((r) => libraryEntryToPublic(r.entry, r.book)));
+});
+
+router.get("/library/stats", async (_req, res): Promise<void> => {
+  const rows = await db.select().from(booksTable);
+  const totalBooks = rows.length;
+  let available = 0;
+  let prebooked = 0;
+  let issued = 0;
+  for (const b of rows) {
+    if (b.status === "prebooked") prebooked++;
+    else if (b.status === "issued") issued++;
+    else available++;
+  }
+  const recentlyPrebooked = rows
+    .filter((b) => b.status === "prebooked")
+    .slice(0, 6)
+    .map(bookToPublic);
+  res.json({ totalBooks, available, prebooked, issued, recentlyPrebooked });
 });
 
 router.get("/library/continue-reading", requireUser, async (req, res): Promise<void> => {

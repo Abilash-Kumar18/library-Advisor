@@ -5,6 +5,7 @@
  * Library AI — Book recommendation API
  * OpenAPI spec version: 0.1.0
  */
+import type { BookStatus } from "./bookStatus";
 
 export interface Book {
   id: string;
@@ -18,4 +19,5 @@ export interface Book {
   pages: number;
   year: number;
   shortDescription: string;
+  status: BookStatus;
 }

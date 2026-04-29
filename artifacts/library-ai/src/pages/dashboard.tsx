@@ -1,11 +1,43 @@
 import React from "react";
 import { Link } from "wouter";
-import { Loader2, ArrowRight, Flame, Clock } from "lucide-react";
+import { Loader2, ArrowRight, Flame, Clock, BookMarked, BookCheck, Bookmark, BookOpen } from "lucide-react";
 
-import { useGetCurrentUser, useListTrendingBooks, useListContinueReading, useGetRecommendations, useGetBasedOnInterests } from "@workspace/api-client-react";
+import { useGetCurrentUser, useListTrendingBooks, useListContinueReading, useGetRecommendations, useGetBasedOnInterests, useGetLibraryStats } from "@workspace/api-client-react";
 import { BookCard } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+
+interface StatsCardProps {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  accent: string;
+  dot?: string;
+  isLoading?: boolean;
+}
+
+function StatsCard({ label, value, icon, accent, dot, isLoading }: StatsCardProps) {
+  return (
+    <Card className="rounded-2xl border-border/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all bg-card">
+      <CardContent className="p-5 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${accent}`}>
+            {icon}
+          </div>
+          {dot && <span className={`h-2.5 w-2.5 rounded-full ${dot} animate-pulse`} />}
+        </div>
+        <div className="space-y-0.5">
+          <p className="text-sm font-medium text-muted-foreground">{label}</p>
+          <p className="text-3xl font-serif font-bold tracking-tight text-foreground tabular-nums">
+            {isLoading ? <span className="inline-block h-8 w-16 bg-muted animate-pulse rounded" /> : value}
+          </p>
+          <p className="text-xs text-muted-foreground/70">Live count</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function DashboardPage() {
   const { data: currentUser } = useGetCurrentUser();
@@ -15,6 +47,7 @@ export default function DashboardPage() {
   const { data: continueReading, isLoading: loadingContinue } = useListContinueReading();
   const { data: trendingBooks, isLoading: loadingTrending } = useListTrendingBooks();
   const { data: basedOnInterests, isLoading: loadingInterests } = useGetBasedOnInterests();
+  const { data: stats, isLoading: loadingStats } = useGetLibraryStats();
 
   return (
     <div className="space-y-12 animate-in fade-in duration-500 pb-12">
@@ -22,6 +55,65 @@ export default function DashboardPage() {
         <h1 className="text-4xl font-serif font-bold text-foreground">Hi {userName}, ready to explore?</h1>
         <p className="text-lg text-muted-foreground">Here's what we've curated for you today.</p>
       </div>
+
+      {/* Library Statistics */}
+      <section className="space-y-4">
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="text-2xl font-serif font-bold text-foreground">Library Statistics</h2>
+            <p className="text-sm text-muted-foreground">A live view of inventory across the catalog.</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            label="Total Books"
+            value={stats?.totalBooks ?? 0}
+            icon={<BookOpen className="h-5 w-5 text-primary" />}
+            accent="bg-primary/10"
+            isLoading={loadingStats}
+          />
+          <StatsCard
+            label="Available"
+            value={stats?.available ?? 0}
+            icon={<BookCheck className="h-5 w-5 text-emerald-600" />}
+            accent="bg-emerald-100"
+            dot="bg-emerald-500"
+            isLoading={loadingStats}
+          />
+          <StatsCard
+            label="Prebooked"
+            value={stats?.prebooked ?? 0}
+            icon={<Bookmark className="h-5 w-5 text-accent" />}
+            accent="bg-accent/10"
+            dot="bg-accent"
+            isLoading={loadingStats}
+          />
+          <StatsCard
+            label="Issued"
+            value={stats?.issued ?? 0}
+            icon={<BookMarked className="h-5 w-5 text-rose-600" />}
+            accent="bg-rose-100"
+            dot="bg-rose-500"
+            isLoading={loadingStats}
+          />
+        </div>
+
+        {stats && stats.recentlyPrebooked.length > 0 && (
+          <div className="pt-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">Recently Prebooked</h3>
+            <div className="flex gap-3 flex-wrap">
+              {stats.recentlyPrebooked.slice(0, 5).map(b => (
+                <Link key={b.id} href={`/books/${b.id}`} className="group">
+                  <div className="flex items-center gap-3 px-3 py-2 bg-accent/5 border border-accent/20 rounded-xl hover:bg-accent/10 transition-colors">
+                    <Bookmark className="h-4 w-4 text-accent shrink-0" />
+                    <span className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-primary transition-colors">{b.title}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Recommended for You */}
       <section className="space-y-4">
@@ -106,8 +198,8 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {basedOnInterests?.slice(0, 3).map((book) => (
-                <BookCard key={book.id} book={book} />
+              {basedOnInterests?.slice(0, 3).map((rec) => (
+                <BookCard key={rec.book.id} book={rec.book} />
               ))}
             </div>
           )}

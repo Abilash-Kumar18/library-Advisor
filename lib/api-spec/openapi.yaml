@@ -211,6 +211,44 @@ paths:
                 items:
                   $ref: "#/components/schemas/LibraryEntry"
 
+  /library/stats:
+    get:
+      operationId: getLibraryStats
+      tags: [library]
+      summary: Inventory counts across the catalog
+      responses:
+        "200":
+          description: Counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LibraryStats"
+
+  /books/{bookId}/status:
+    patch:
+      operationId: updateBookStatus
+      tags: [books]
+      summary: Update a book's inventory status
+      parameters:
+        - in: path
+          name: bookId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookStatusRequest"
+      responses:
+        "200":
+          description: Updated book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+
   /library/continue-reading:
     get:
       operationId: listContinueReading
@@ -484,7 +522,10 @@ components:
           type: integer
         shortDescription:
           type: string
-      required: [id, title, author, coverUrl, genre, tags, rating, ratingsCount, pages, year, shortDescription]
+        status:
+          type: string
+          enum: [available, prebooked, issued]
+      required: [id, title, author, coverUrl, genre, tags, rating, ratingsCount, pages, year, shortDescription, status]
 
     BookDetail:
       allOf:
@@ -542,6 +583,31 @@ components:
           type: string
           enum: [reading, read, want_to_read]
       required: [bookId, status]
+
+    LibraryStats:
+      type: object
+      properties:
+        totalBooks:
+          type: integer
+        available:
+          type: integer
+        prebooked:
+          type: integer
+        issued:
+          type: integer
+        recentlyPrebooked:
+          type: array
+          items:
+            $ref: "#/components/schemas/Book"
+      required: [totalBooks, available, prebooked, issued, recentlyPrebooked]
+
+    UpdateBookStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [available, prebooked, issued]
+      required: [status]
 
     UpdateLibraryEntryRequest:
       type: object

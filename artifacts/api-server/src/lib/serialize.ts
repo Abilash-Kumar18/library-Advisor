@@ -13,6 +13,7 @@ export function bookToPublic(book: Book) {
     pages: book.pages,
     year: book.year,
     shortDescription: book.shortDescription,
+    status: (book.status ?? "available") as "available" | "prebooked" | "issued",
   };
 }
 

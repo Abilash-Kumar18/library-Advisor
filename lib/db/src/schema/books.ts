@@ -22,6 +22,7 @@ export const booksTable = pgTable("books", {
   shortDescription: text("short_description").notNull().default(""),
   description: text("description").notNull().default(""),
   trendingScore: integer("trending_score").notNull().default(0),
+  status: text("status").notNull().default("available"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

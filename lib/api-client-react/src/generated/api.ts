@@ -24,6 +24,7 @@ import type {
   GetRecommendationsParams,
   HealthStatus,
   LibraryEntry,
+  LibraryStats,
   ListBooksParams,
   ListLibraryParams,
   LoginRequest,
@@ -31,6 +32,7 @@ import type {
   Recommendation,
   SignupRequest,
   SimpleStatus,
+  UpdateBookStatusRequest,
   UpdateLibraryEntryRequest,
   UpdatePreferencesRequest,
   User,
@@ -871,6 +873,168 @@ export function useListLibrary<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Inventory counts across the catalog
+ */
+export const getGetLibraryStatsUrl = () => {
+  return `/api/library/stats`;
+};
+
+export const getLibraryStats = async (
+  options?: RequestInit,
+): Promise<LibraryStats> => {
+  return customFetch<LibraryStats>(getGetLibraryStatsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetLibraryStatsQueryKey = () => {
+  return [`/api/library/stats`] as const;
+};
+
+export const getGetLibraryStatsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getLibraryStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getLibraryStats>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetLibraryStatsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLibraryStats>>> = ({
+    signal,
+  }) => getLibraryStats({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getLibraryStats>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetLibraryStatsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getLibraryStats>>
+>;
+export type GetLibraryStatsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Inventory counts across the catalog
+ */
+
+export function useGetLibraryStats<
+  TData = Awaited<ReturnType<typeof getLibraryStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getLibraryStats>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetLibraryStatsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Update a book's inventory status
+ */
+export const getUpdateBookStatusUrl = (bookId: string) => {
+  return `/api/books/${bookId}/status`;
+};
+
+export const updateBookStatus = async (
+  bookId: string,
+  updateBookStatusRequest: UpdateBookStatusRequest,
+  options?: RequestInit,
+): Promise<Book> => {
+  return customFetch<Book>(getUpdateBookStatusUrl(bookId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateBookStatusRequest),
+  });
+};
+
+export const getUpdateBookStatusMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBookStatus>>,
+    TError,
+    { bookId: string; data: BodyType<UpdateBookStatusRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateBookStatus>>,
+  TError,
+  { bookId: string; data: BodyType<UpdateBookStatusRequest> },
+  TContext
+> => {
+  const mutationKey = ["updateBookStatus"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateBookStatus>>,
+    { bookId: string; data: BodyType<UpdateBookStatusRequest> }
+  > = (props) => {
+    const { bookId, data } = props ?? {};
+
+    return updateBookStatus(bookId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateBookStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateBookStatus>>
+>;
+export type UpdateBookStatusMutationBody = BodyType<UpdateBookStatusRequest>;
+export type UpdateBookStatusMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update a book's inventory status
+ */
+export const useUpdateBookStatus = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBookStatus>>,
+    TError,
+    { bookId: string; data: BodyType<UpdateBookStatusRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateBookStatus>>,
+  TError,
+  { bookId: string; data: BodyType<UpdateBookStatusRequest> },
+  TContext
+> => {
+  return useMutation(getUpdateBookStatusMutationOptions(options));
+};
 
 /**
  * @summary Books the user is currently reading

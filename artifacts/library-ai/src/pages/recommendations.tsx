@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Loader2, Search, SlidersHorizontal, BookOpen } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { useGetRecommendations, useGetGenreList, useListBooks, RecommendationModel } from "@workspace/api-client-react";
+import { useGetRecommendations, useGetGenreList, useListBooks, getListBooksQueryKey, RecommendationModel } from "@workspace/api-client-react";
 import { BookCard } from "@/components/book-card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,12 +31,13 @@ export default function RecommendationsPage() {
 
   const hasFilters = debouncedSearch || genre !== "all" || minRating[0] > 0;
   
-  const { data: catalogBooks, isLoading: loadingCatalog } = useListBooks({ 
+  const catalogParams = { 
     search: debouncedSearch || undefined, 
     genre: genre !== "all" ? genre : undefined,
     minRating: minRating[0] > 0 ? minRating[0] : undefined,
-    limit: 24
-  }, { query: { enabled: hasFilters } });
+    limit: 24,
+  };
+  const { data: catalogBooks, isLoading: loadingCatalog } = useListBooks(catalogParams, { query: { enabled: Boolean(hasFilters), queryKey: getListBooksQueryKey(catalogParams) } });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">

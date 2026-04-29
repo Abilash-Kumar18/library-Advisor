@@ -1,0 +1,76 @@
+Update my existing "Library AI" web application by adding a Library Statistics Dashboard section.
+
+IMPORTANT:
+- Keep the current UI design exactly the same (light theme, spacing, typography, colors)
+- Do NOT redesign the page, only extend it cleanly
+
+📍 Placement:
+- Add this section in the Dashboard page
+- Position it ABOVE the "Top AI Matches / Recommendations" section
+
+📊 Library Statistics Section:
+
+Create 4 responsive stat cards in a horizontal grid:
+
+1. Total Books
+- Label: "Total Books"
+- Show total number of books
+- Icon: book
+- Color: primary indigo theme
+
+2. Available Books
+- Label: "Available"
+- Count books where status = "available"
+- Highlight with green indicator
+
+3. Prebooked Books
+- Label: "Prebooked"
+- Count books where status = "prebooked"
+- Highlight with orange indicator
+
+4. Issued Books
+- Label: "Issued"
+- Count books where status = "issued"
+- Highlight with red indicator
+
+🎨 Design Requirements:
+- Match existing card UI (rounded corners, soft shadows)
+- Maintain same padding and spacing system
+- Add subtle hover animation
+- Show small subtitle: "Live count"
+- Use minimal modern icons
+
+📚 Data Structure:
+Each book object should include:
+{
+  id: number,
+  title: string,
+  author: string,
+  status: "available" | "prebooked" | "issued"
+}
+
+⚙️ Logic:
+- totalBooks = allBooks.length
+- availableBooks = books.filter(book => book.status === "available").length
+- prebookedBooks = books.filter(book => book.status === "prebooked").length
+- issuedBooks = books.filter(book => book.status === "issued").length
+
+🔄 Dynamic Behavior:
+- When user clicks "Prebook" → update status to "prebooked"
+- When book is issued → update status to "issued"
+- Stats should update instantly in UI
+
+📊 Optional Enhancement:
+- Add a small donut chart showing:
+  Available vs Prebooked vs Issued
+- Add a "Recently Prebooked Books" list below stats
+
+📱 Responsiveness:
+- Desktop: 4 cards in one row
+- Tablet: 2 cards per row
+- Mobile: 1 card per row
+
+OUTPUT:
+- React + Tailwind CSS components
+- Reusable StatsCard component
+- Include mock data or simple API integration

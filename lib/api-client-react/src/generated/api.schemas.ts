@@ -68,6 +68,14 @@ export interface UpdatePreferencesRequest {
   readingStyle: UpdatePreferencesRequestReadingStyle;
 }
 
+export type BookStatus = (typeof BookStatus)[keyof typeof BookStatus];
+
+export const BookStatus = {
+  available: "available",
+  prebooked: "prebooked",
+  issued: "issued",
+} as const;
+
 export interface Book {
   id: string;
   title: string;
@@ -80,6 +88,7 @@ export interface Book {
   pages: number;
   year: number;
   shortDescription: string;
+  status: BookStatus;
 }
 
 export type BookDetailLibraryStatus =
@@ -133,6 +142,27 @@ export const AddLibraryEntryRequestStatus = {
 export interface AddLibraryEntryRequest {
   bookId: string;
   status: AddLibraryEntryRequestStatus;
+}
+
+export interface LibraryStats {
+  totalBooks: number;
+  available: number;
+  prebooked: number;
+  issued: number;
+  recentlyPrebooked: Book[];
+}
+
+export type UpdateBookStatusRequestStatus =
+  (typeof UpdateBookStatusRequestStatus)[keyof typeof UpdateBookStatusRequestStatus];
+
+export const UpdateBookStatusRequestStatus = {
+  available: "available",
+  prebooked: "prebooked",
+  issued: "issued",
+} as const;
+
+export interface UpdateBookStatusRequest {
+  status: UpdateBookStatusRequestStatus;
 }
 
 export type UpdateLibraryEntryRequestStatus =

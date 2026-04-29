@@ -157,6 +157,7 @@ export const ListBooksResponseItem = zod.object({
   pages: zod.number(),
   year: zod.number(),
   shortDescription: zod.string(),
+  status: zod.enum(["available", "prebooked", "issued"]),
 });
 export const ListBooksResponse = zod.array(ListBooksResponseItem);
 
@@ -175,6 +176,7 @@ export const ListTrendingBooksResponseItem = zod.object({
   pages: zod.number(),
   year: zod.number(),
   shortDescription: zod.string(),
+  status: zod.enum(["available", "prebooked", "issued"]),
 });
 export const ListTrendingBooksResponse = zod.array(
   ListTrendingBooksResponseItem,
@@ -200,6 +202,7 @@ export const GetBookResponse = zod
     pages: zod.number(),
     year: zod.number(),
     shortDescription: zod.string(),
+    status: zod.enum(["available", "prebooked", "issued"]),
   })
   .and(
     zod.object({
@@ -218,6 +221,7 @@ export const GetBookResponse = zod
           pages: zod.number(),
           year: zod.number(),
           shortDescription: zod.string(),
+          status: zod.enum(["available", "prebooked", "issued"]),
         }),
       ),
       inLibrary: zod.boolean(),
@@ -255,6 +259,7 @@ export const ListLibraryResponseItem = zod.object({
     pages: zod.number(),
     year: zod.number(),
     shortDescription: zod.string(),
+    status: zod.enum(["available", "prebooked", "issued"]),
   }),
   status: zod.enum(["reading", "read", "want_to_read"]),
   progress: zod.number().describe("0-100 percent"),
@@ -262,6 +267,58 @@ export const ListLibraryResponseItem = zod.object({
   addedAt: zod.coerce.date(),
 });
 export const ListLibraryResponse = zod.array(ListLibraryResponseItem);
+
+/**
+ * @summary Inventory counts across the catalog
+ */
+export const GetLibraryStatsResponse = zod.object({
+  totalBooks: zod.number(),
+  available: zod.number(),
+  prebooked: zod.number(),
+  issued: zod.number(),
+  recentlyPrebooked: zod.array(
+    zod.object({
+      id: zod.string(),
+      title: zod.string(),
+      author: zod.string(),
+      coverUrl: zod.string(),
+      genre: zod.string(),
+      tags: zod.array(zod.string()),
+      rating: zod.number(),
+      ratingsCount: zod.number(),
+      pages: zod.number(),
+      year: zod.number(),
+      shortDescription: zod.string(),
+      status: zod.enum(["available", "prebooked", "issued"]),
+    }),
+  ),
+});
+
+/**
+ * @summary Update a book's inventory status
+ */
+export const UpdateBookStatusParams = zod.object({
+  bookId: zod.coerce.string(),
+});
+
+export const UpdateBookStatusBody = zod.object({
+  status: zod.enum(["available", "prebooked", "issued"]),
+});
+
+export const UpdateBookStatusResponse = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  author: zod.string(),
+  coverUrl: zod.string(),
+  genre: zod.string(),
+  tags: zod.array(zod.string()),
+  rating: zod.number(),
+  ratingsCount: zod.number(),
+  pages: zod.number(),
+  year: zod.number(),
+  shortDescription: zod.string(),
+  status: zod.enum(["available", "prebooked", "issued"]),
+});
 
 /**
  * @summary Books the user is currently reading
@@ -281,6 +338,7 @@ export const ListContinueReadingResponseItem = zod.object({
     pages: zod.number(),
     year: zod.number(),
     shortDescription: zod.string(),
+    status: zod.enum(["available", "prebooked", "issued"]),
   }),
   status: zod.enum(["reading", "read", "want_to_read"]),
   progress: zod.number().describe("0-100 percent"),
@@ -314,6 +372,7 @@ export const AddToLibraryResponse = zod.object({
     pages: zod.number(),
     year: zod.number(),
     shortDescription: zod.string(),
+    status: zod.enum(["available", "prebooked", "issued"]),
   }),
   status: zod.enum(["reading", "read", "want_to_read"]),
   progress: zod.number().describe("0-100 percent"),
@@ -349,6 +408,7 @@ export const UpdateLibraryEntryResponse = zod.object({
     pages: zod.number(),
     year: zod.number(),
     shortDescription: zod.string(),
+    status: zod.enum(["available", "prebooked", "issued"]),
   }),
   status: zod.enum(["reading", "read", "want_to_read"]),
   progress: zod.number().describe("0-100 percent"),
@@ -393,6 +453,7 @@ export const GetRecommendationsResponseItem = zod.object({
     pages: zod.number(),
     year: zod.number(),
     shortDescription: zod.string(),
+    status: zod.enum(["available", "prebooked", "issued"]),
   }),
   matchPercent: zod.number().describe("0-100 AI match score"),
   reason: zod.string().describe("Human-readable explanation"),
@@ -418,6 +479,7 @@ export const GetBasedOnInterestsResponseItem = zod.object({
     pages: zod.number(),
     year: zod.number(),
     shortDescription: zod.string(),
+    status: zod.enum(["available", "prebooked", "issued"]),
   }),
   matchPercent: zod.number().describe("0-100 AI match score"),
   reason: zod.string().describe("Human-readable explanation"),

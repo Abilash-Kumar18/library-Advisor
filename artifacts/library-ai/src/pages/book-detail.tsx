@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useLocation } from "wouter";
-import { Loader2, Star, ArrowLeft, Plus, CheckCircle, Clock, BookOpen, Trash2, Library as LibraryIcon } from "lucide-react";
+import { Loader2, Star, ArrowLeft, Plus, CheckCircle, Clock, BookOpen, Trash2, Library as LibraryIcon, Bookmark, BookMarked, BookCheck } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { 
@@ -8,11 +8,14 @@ import {
   useAddToLibrary, 
   useUpdateLibraryEntry, 
   useRemoveFromLibrary,
+  useUpdateBookStatus,
   getGetBookQueryKey,
   getListLibraryQueryKey,
   getListContinueReadingQueryKey,
+  getGetLibraryStatsQueryKey,
   BookDetailLibraryStatus,
-  AddLibraryEntryRequestStatus
+  AddLibraryEntryRequestStatus,
+  UpdateBookStatusRequestStatus
 } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,11 +39,25 @@ export default function BookDetailPage() {
   const addMutation = useAddToLibrary();
   const updateMutation = useUpdateLibraryEntry();
   const removeMutation = useRemoveFromLibrary();
+  const statusMutation = useUpdateBookStatus();
 
   const invalidateLibraryQueries = () => {
     queryClient.invalidateQueries({ queryKey: getGetBookQueryKey(id!) });
     queryClient.invalidateQueries({ queryKey: getListLibraryQueryKey() });
     queryClient.invalidateQueries({ queryKey: getListContinueReadingQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetLibraryStatsQueryKey() });
+  };
+
+  const handleInventoryStatus = (status: UpdateBookStatusRequestStatus) => {
+    statusMutation.mutate(
+      { bookId: id!, data: { status } },
+      {
+        onSuccess: () => {
+          toast({ title: "Inventory updated", description: `Book marked as ${status}.` });
+          invalidateLibraryQueries();
+        },
+      },
+    );
   };
 
   const handleAdd = (status: AddLibraryEntryRequestStatus) => {
@@ -53,7 +70,7 @@ export default function BookDetailPage() {
   };
 
   const handleUpdateStatus = (status: BookDetailLibraryStatus) => {
-    updateMutation.mutate({ id: id!, data: { status: status as any } }, {
+    updateMutation.mutate({ bookId: id!, data: { status: status as any } }, {
       onSuccess: () => {
         toast({ title: "Status updated", description: `Book marked as ${status?.replace(/_/g, ' ')}` });
         invalidateLibraryQueries();
@@ -62,7 +79,7 @@ export default function BookDetailPage() {
   };
 
   const handleUpdateProgress = () => {
-    updateMutation.mutate({ id: id!, data: { progress: tempProgress[0] } }, {
+    updateMutation.mutate({ bookId: id!, data: { progress: tempProgress[0] } }, {
       onSuccess: () => {
         toast({ title: "Progress updated", description: `You're now ${tempProgress[0]}% through.` });
         setProgressDialog(false);
@@ -72,7 +89,7 @@ export default function BookDetailPage() {
   };
 
   const handleRate = (rating: number) => {
-    updateMutation.mutate({ id: id!, data: { rating } }, {
+    updateMutation.mutate({ bookId: id!, data: { rating } }, {
       onSuccess: () => {
         toast({ title: "Rating saved" });
         invalidateLibraryQueries();
@@ -81,7 +98,7 @@ export default function BookDetailPage() {
   };
 
   const handleRemove = () => {
-    removeMutation.mutate({ id: id! }, {
+    removeMutation.mutate({ bookId: id! }, {
       onSuccess: () => {
         toast({ title: "Removed from library" });
         invalidateLibraryQueries();
@@ -107,6 +124,58 @@ export default function BookDetailPage() {
           </div>
           
           <div className="flex flex-col gap-3">
+            {/* Inventory status panel */}
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Inventory</span>
+                <Badge
+                  variant="outline"
+                  className={`uppercase tracking-wider py-1 px-3 text-[10px] font-semibold ${
+                    book.status === "available"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                      : book.status === "prebooked"
+                      ? "bg-accent/10 text-accent border-accent/20"
+                      : "bg-rose-50 text-rose-700 border-rose-200"
+                  }`}
+                  data-testid="badge-book-status"
+                >
+                  {book.status}
+                </Badge>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  size="sm"
+                  variant={book.status === "available" ? "default" : "outline"}
+                  className="gap-1 text-xs"
+                  onClick={() => handleInventoryStatus("available")}
+                  disabled={statusMutation.isPending || book.status === "available"}
+                  data-testid="btn-mark-available"
+                >
+                  <BookCheck className="h-3.5 w-3.5" /> Available
+                </Button>
+                <Button
+                  size="sm"
+                  variant={book.status === "prebooked" ? "default" : "outline"}
+                  className="gap-1 text-xs"
+                  onClick={() => handleInventoryStatus("prebooked")}
+                  disabled={statusMutation.isPending || book.status === "prebooked"}
+                  data-testid="btn-prebook"
+                >
+                  <Bookmark className="h-3.5 w-3.5" /> Prebook
+                </Button>
+                <Button
+                  size="sm"
+                  variant={book.status === "issued" ? "default" : "outline"}
+                  className="gap-1 text-xs"
+                  onClick={() => handleInventoryStatus("issued")}
+                  disabled={statusMutation.isPending || book.status === "issued"}
+                  data-testid="btn-issue"
+                >
+                  <BookMarked className="h-3.5 w-3.5" /> Issue
+                </Button>
+              </div>
+            </div>
+
             {!book.inLibrary ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

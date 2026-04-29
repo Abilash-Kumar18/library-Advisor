@@ -1,7 +1,11 @@
 import { Router, type IRouter } from "express";
 import { and, desc, eq, gte, ilike, or } from "drizzle-orm";
 import { db, booksTable, libraryEntriesTable } from "@workspace/db";
-import { ListBooksQueryParams, GetBookParams } from "@workspace/api-zod";
+import {
+  ListBooksQueryParams,
+  GetBookParams,
+  UpdateBookStatusBody,
+} from "@workspace/api-zod";
 import { bookToPublic } from "../lib/serialize";
 import { getCurrentUser } from "../lib/auth";
 
@@ -96,6 +100,29 @@ router.get("/books/:bookId", async (req, res): Promise<void> => {
     libraryStatus,
     userRating,
   });
+});
+
+router.patch("/books/:bookId/status", async (req, res): Promise<void> => {
+  const params = GetBookParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = UpdateBookStatusBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+  const [book] = await db
+    .update(booksTable)
+    .set({ status: body.data.status })
+    .where(eq(booksTable.id, params.data.bookId))
+    .returning();
+  if (!book) {
+    res.status(404).json({ error: "Book not found" });
+    return;
+  }
+  res.json(bookToPublic(book));
 });
 
 export default router;
