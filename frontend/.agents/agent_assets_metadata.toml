@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "w_BML4b1uuYS3M_E6vOlB"
+uri = "file://artifacts/library-ai/public/hero.png"
+type = "image"
+title = "magical books landing hero"
+
+[[generated]]
+id = "VpDq-WcJfkhukVLbASAUf"
+uri = "file://artifacts/library-ai/public/empty-library.png"
+type = "image"
+title = "empty library shelf"
+
+[[generated]]
+id = "mfwXIoGfTAlgdk1MKES7k"
+uri = "file://artifacts/library-ai/public/auth-bg.png"
+type = "image"
+title = "reading sanctuary auth side"

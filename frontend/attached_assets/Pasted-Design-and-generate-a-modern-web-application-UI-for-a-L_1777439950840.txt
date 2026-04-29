@@ -1,0 +1,119 @@
+Design and generate a modern web application UI for a "Library Recommendation System" powered by AI.
+
+Theme:
+- Use a clean LIGHT THEME
+- Background: soft off-white (#F8FAFC)
+- Primary color: Indigo (#4F46E5)
+- Secondary color: Soft teal (#14B8A6)
+- Accent color: Warm orange (#F59E0B)
+- Text: Dark gray (#1F2937)
+- Use subtle gradients and soft shadows for depth
+
+Design Style:
+- Minimal, modern, and clean (inspired by Apple + Notion UI)
+- Rounded corners (12px–16px)
+- Soft card-based layout
+- Smooth hover and transition animations
+- Plenty of white space
+
+Pages & Structure:
+
+1. Landing Page
+- Hero section with headline: "Discover Your Next Favorite Book with AI"
+- Subtext: Personalized recommendations based on your reading habits
+- CTA buttons: "Get Started" and "Explore Books"
+- Illustration of books + AI suggestions
+- Feature highlights:
+  - AI-based recommendations
+  - Smart reading insights
+  - Personalized dashboard
+
+2. Authentication Page
+- Simple login/signup form
+- Fields:
+  - Name
+  - Email
+  - Phone Number
+  - Interested Genres (multi-select)
+- Clean card UI centered on screen
+
+3. User Onboarding
+- Ask user preferences:
+  - Favorite genres
+  - Preferred authors
+  - Reading style (fast-paced, academic, casual)
+- Progress step UI (step 1 → step 3)
+
+4. Dashboard (Main Page)
+- Welcome message: "Hi [User], ready to explore?"
+- Sections:
+  - Recommended for You (AI suggestions carousel)
+  - Continue Reading
+  - Trending Books
+  - Based on Your Interests
+- Sidebar:
+  - Home
+  - My Library
+  - Recommendations
+  - Profile
+
+5. Recommendation Engine UI
+- Show book cards with:
+  - Cover image
+  - Title
+  - Author
+  - Rating
+  - Match percentage (AI score)
+- Filters:
+  - Genre
+  - Author
+  - Rating
+- Toggle:
+  - Content-Based
+  - Collaborative
+  - Hybrid Model
+
+6. Book Details Page
+- Large book cover
+- Description
+- Author info
+- Tags (genre, style)
+- Buttons:
+  - Add to Library
+  - Mark as Read
+  - Rate Book
+
+7. User Profile Page
+- User info
+- Reading stats:
+  - Books read
+  - Favorite genre
+  - Reading time
+- AI Insight:
+  - "You prefer fast-paced mystery novels"
+
+Components to Include:
+- Reusable cards
+- Search bar with AI suggestions
+- Rating system (stars)
+- Progress tracker (reading status)
+- Tag chips for genres
+- Recommendation badges
+
+AI Features UI:
+- Show "Why this book?" explanation
+- Example:
+  "Recommended because you liked mystery novels by Agatha Christie"
+
+Animations:
+- Smooth hover on cards
+- Fade-in for recommendations
+- Micro-interactions on buttons
+
+Responsiveness:
+- Fully responsive (mobile + tablet + desktop)
+
+Output Format:
+- Clean React + Tailwind CSS components
+- Modular structure
+- Reusable UI components

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Library AI"
+version = "1.0.0"
+id = "artifacts/library-ai"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26017
+
+[services.development]
+run = "pnpm --filter @workspace/library-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/library-ai", "run", "build" ]
+publicDir = "artifacts/library-ai/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26017"
+BASE_PATH = "/"
