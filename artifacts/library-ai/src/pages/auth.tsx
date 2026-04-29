@@ -7,6 +7,19 @@ import { Loader2, BookOpen } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useLogin, useSignup, getGetCurrentUserQueryKey, useGetGenreList } from "@workspace/api-client-react";
+
+function extractApiError(err: unknown, fallback: string): string {
+  if (err && typeof err === "object") {
+    const data = (err as { data?: { error?: unknown } }).data;
+    if (data && typeof data.error === "string") return data.error;
+    const message = (err as { message?: unknown }).message;
+    if (typeof message === "string") {
+      const cleaned = message.replace(/^HTTP \d+[^:]*:\s*/, "").trim();
+      if (cleaned) return cleaned;
+    }
+  }
+  return fallback;
+}
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,7 +68,7 @@ export default function AuthPage() {
         setLocation("/dashboard");
       },
       onError: (error) => {
-        toast({ title: "Login failed", description: error.message || "Invalid credentials", variant: "destructive" });
+        toast({ title: "Login failed", description: extractApiError(error, "Invalid credentials"), variant: "destructive" });
       }
     });
   };
@@ -68,7 +81,7 @@ export default function AuthPage() {
         setLocation("/onboarding");
       },
       onError: (error) => {
-        toast({ title: "Signup failed", description: error.message || "Could not create account", variant: "destructive" });
+        toast({ title: "Signup failed", description: extractApiError(error, "Could not create account"), variant: "destructive" });
       }
     });
   };
