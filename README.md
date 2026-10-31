@@ -452,16 +452,4 @@ The repository provides the foundation for a complete AI-powered library platfor
 | [replit-agent](https://github.com/replit-agent) | 1 |
 | [dharshinibala025](https://github.com/dharshinibala025) | 1 |
 
-## License
 
-The frontend workspace declares an MIT license. Add a root-level `LICENSE` file if the entire repository is intended to be distributed under the MIT License.
-
-## Questions and Contributions
-
-Issues and pull requests are welcome. When contributing:
-
-1. Create a feature branch.
-2. Keep frontend and backend changes separated where possible.
-3. Update the OpenAPI specification when changing API contracts.
-4. Run frontend type checking before submitting a pull request.
-5. Include clear details about recommendation or data-processing changes.
