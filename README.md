@@ -9,7 +9,6 @@ Readers often struggle to find relevant books because:
 - Large catalogs make manual discovery difficult.
 - Generic search does not always reflect a reader’s interests.
 - Book information, recommendations, and reading progress are often spread across different platforms.
-- Users need a simple way to organize books they are reading, have completed, or want to read.
 
 ## Solution
 
